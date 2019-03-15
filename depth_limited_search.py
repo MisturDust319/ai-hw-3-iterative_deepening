@@ -55,8 +55,25 @@ class Node:
         self.print_path()
 
 
-# class Problem:
-#     def __init__(self, start, end, actions):
+class Problem:
+    def __init__(self, start, end, actions):
+        """
+        Class that represents a problem, including it's starting point, the goal,
+        and instructions on how to reach the goal
+        :param start:
+        The starting state of the problem
+        :param end:
+        The end goal state of the problem
+        :param actions:
+        A callback that calculates solutions to the problem
+            :param state:
+                the current state of a problem used to calculate possible next
+                steps for the problem
+        """
+        self.start = start
+        self.end = end
+        self.actions = actions
+
 
 
 def depth_limited_search(problem, cutoff):
