@@ -26,18 +26,18 @@ def apply_action(board,action):
     # generate new position for blank tile
     try:
         # generate a new board and try to replace the old one
-
+        new_board = np.copy(board)
         # swap the old val at new_x, new_y with 0
-        el = board[new_x,new_y]
-        board[x,y] = el
-        board[new_x,new_y] = 0
+        el = new_board[new_x,new_y]
+        new_board[x,y] = el
+        new_board[new_x,new_y] = 0
 
-       # print(new_x, new_y)
-       # print(board)
+        # print(new_x, new_y)
+        # print(board)
+        return new_board
     except IndexError:
         # if the solution is invalid, return the old board
-        pass
-    return board
+        return board
 
 
 def goal_test(board):
@@ -78,18 +78,24 @@ def mess_up(board,actions,moves):
     """
     for iter in range(0,moves):
         board = apply_action(board,actions[random.randint(0,3)])
-    pass
+    return board
 
 class EightPuzzleProblem(Problem):
     def __init__(self):
         # create a board then mess it up for end state
-        start = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
-        mess_up(start, ACTIONS, 10)
+        # start_state = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
+        # start_state = mess_up(start_state, ACTIONS, 10)
+        # start_state = np.array([[1, 2, 3], [4, 5, 6], [7, 0, 8]])
+        # start_state = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+        start_state = np.array([[1, 2, 3], [4, 5, 6], [7, 0, 8]])
+
+        start_node = Node(start_state)
         # end goal is normal
-        goal = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
+        goal_state = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
+        goal_node = Node(goal_state)
 
         # feed the super init the start and end state
-        super().__init__(start, goal)
+        super().__init__(start_node, goal_node)
 
     def actions(self, state):
         """
@@ -117,6 +123,18 @@ class EightPuzzleProblem(Problem):
         # use the predefined goal test for 8-Puzzle
         return goal_test(state)
 
+    def node_comparison(self, a, b):
+        """
+        Returns true if the two nodes are equal
+        :param a:
+        First node
+        :param b:
+        Second node
+        :return:
+        True if two nodes are equal
+        False otherwise
+        """
+        return np.array_equal(a, b)
 
 def random_search(board):
     # create a sequce of 32 random moves and keep going until it is solved.

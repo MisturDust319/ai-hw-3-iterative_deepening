@@ -14,3 +14,4 @@ def iterative_deepening_search(problem):
         result = depth_limited_search(problem, depth)
         if result != problem.cutoff:
             return result
+        depth += 1

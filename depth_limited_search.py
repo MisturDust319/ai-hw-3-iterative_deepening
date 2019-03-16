@@ -94,7 +94,18 @@ class Problem:
         """
         pass
 
-
+    def node_comparison(self, a, b):
+        """
+        Compare two nodes
+        :param a:
+        first node
+        :param b:
+        second node
+        :return:
+        True if equal,
+        False otherwise
+        """
+        pass
 
 def depth_limited_search(problem, limit):
     """
@@ -105,8 +116,24 @@ def depth_limited_search(problem, limit):
     The maximum depth to search
     :return:
     """
+    visited = []
+    def has_visited(state):
+        """
+        Helper function that checks if a node has been visited
+        :param node:
+        Node to check
+        :return:
+        True if it has been visited
+        False otherwise
+        """
+        for i in visited:
+            if problem.node_comparison(state, i):
+                return True
+        return False
+
     def recursive_dls(node, limit):
         # check if solution was found
+        visited.append(node.state)
         if problem.goal_test(node.state):
             return node.solution()
         elif limit == 0:
@@ -121,18 +148,23 @@ def depth_limited_search(problem, limit):
                 # using the resulting action as state
                 child = Node(action, node)
                 # recursively search with the new child node as a start point
-                result = recursive_dls(child, limit-1)
+                # IF that state hasn't been visited before
+                if not has_visited(child.state):
+                    result = recursive_dls(child, limit-1)
 
-                # end early if a cutoff occured
-                if result == problem.cutoff:
+                    # end early if a cutoff occured
+                    if result == problem.cutoff:
+                        cutoff_occurred = True
+                    # If the result wasn't False (failure), then return result
+                    elif result != False:
+                        return result
+                else:
+                    # treat it like a cutoff if the solution was already found
                     cutoff_occurred = True
-                # If the result wasn't None (failure), then return result
-                elif result is not None:
-                    return result
             if cutoff_occurred:
                 # end early if cutoff occurred
                 return problem.cutoff
             else:
                 # failure condition
-                return None
+                return False
     return recursive_dls(problem.start, limit)

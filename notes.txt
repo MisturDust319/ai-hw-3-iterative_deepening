@@ -1,0 +1,4 @@
+# On Iterative Deepening
+Depending on how many moves the solution needs, iterative deepening is
+too inefficient. Each iteration can generate between 0
+(if it finds a solution or
