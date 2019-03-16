@@ -16,8 +16,6 @@ function DEPTH-LIMITED-SEARCH(problem, l) returns a solution, or failure, or cut
  return solution
 """
 
-from collections import deque
-
 class Node:
     def __init__(self, state, parent=None):
         self.state = state
@@ -53,10 +51,11 @@ class Node:
         By default, it prints the path
         """
         self.print_path()
+        return True
 
 
 class Problem:
-    def __init__(self, start, end, actions):
+    def __init__(self, start, end, cutoff=None):
         """
         Class that represents a problem, including it's starting point, the goal,
         and instructions on how to reach the goal
@@ -72,28 +71,51 @@ class Problem:
         """
         self.start = start
         self.end = end
-        self.actions = actions
+        self.cutoff = cutoff
+
+    def actions(self, state):
+        """
+        A callback used in a search to generate possible solutions
+        :param state:
+        Current state of the problem
+        :return:
+        An iterable representing possible solutions
+        """
+        pass
+
+    def goal_test(self, state):
+        """
+        Used to check if the goal state has been reached
+        :param state:
+        The current state of the problem
+        :return:
+        True if the goal has been met
+        False otherwise
+        """
+        pass
 
 
 
-def depth_limited_search(problem, cutoff):
+def depth_limited_search(problem, limit):
     """
     Searches for a solution to problem
     :param problem:
-    :param cutoff:
+    An object that represents the problem
+    :param limit:
+    The maximum depth to search
     :return:
     """
     def recursive_dls(node, limit):
         # check if solution was found
-        if node.compare(problem.end):
+        if problem.goal_test(node.state):
             return node.solution()
         elif limit == 0:
             # return cutoff if at depth limit
-            return problem.cutoff()
+            return problem.cutoff
         else:
             # otherwise, start the recursive search process
-            cutoff_occured = False
-            # compute a possible action
+            cutoff_occurred = False
+            # compute possible actions as new nodes
             for action in problem.actions(node.state):
                 # create a child node
                 # using the resulting action as state
@@ -102,11 +124,15 @@ def depth_limited_search(problem, cutoff):
                 result = recursive_dls(child, limit-1)
 
                 # end early if a cutoff occured
-                if result == cutoff:
-                    cutoff_occured = True
+                if result == problem.cutoff:
+                    cutoff_occurred = True
+                # If the result wasn't None (failure), then return result
                 elif result is not None:
                     return result
-            if cutoff_occured:
+            if cutoff_occurred:
                 # end early if cutoff occurred
-                return cutoff
-
+                return problem.cutoff
+            else:
+                # failure condition
+                return None
+    return recursive_dls(problem.start, limit)
